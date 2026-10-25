@@ -1,0 +1,11 @@
+I create a new python enviroment
+I activated it 
+I installed streamlit , langchain ,langchain-openai ,chromadb ,pypdf ,python-dotenv.
+create app.py and i build the UI skeleton
+run using streamlit run app.py
+
+
+Add upload a document feature on it
+Add open Ai keys 
+Add process and store document function
+upload file button let it work
