@@ -23,7 +23,7 @@ def process_and_store_documents(uploaded_files):
             tmp_path = tmp_file.name
 
         loader = PyPDFLoader(tmp_path)
-        documents.extend(loader.load())
+        documents.extend(loader.load()) == []
         os.remove(tmp_path)  # Clean up the temp file
 
     # 2. Split the text into chunks
@@ -107,7 +107,7 @@ with middle_panel:
             else:
                 with st.spinner("Thinking..."):
                     # Initialize the LLM
-                    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+                    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 
                     # Define how the AI should answer
                     system_prompt = (
