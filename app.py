@@ -2,7 +2,7 @@ import streamlit as st
 from config.settings import load_config
 from ui.sidebar import render_sidebar
 from ui.file_uploader import render_file_panel
-from ui.chat_interface import render_chat_panel
+from ui.chat_interface import render_chat_interface
 
 
 def main():
@@ -10,7 +10,7 @@ def main():
     load_config()
 
     # 2. Configure global page settings
-    st.set_page_config(layout="wide", page_title="Research_Buddy")
+    st.set_page_config(layout="wide", page_title="Research Budduy")
 
     # 3. Define the layout grid
     left_panel, middle_panel, right_panel = st.columns([1, 3, 1])
@@ -23,7 +23,7 @@ def main():
         render_file_panel()
 
     with middle_panel:
-        render_chat_panel()
+        render_chat_interface()
 
 
 if __name__ == "__main__":

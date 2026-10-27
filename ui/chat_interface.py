@@ -2,52 +2,56 @@ import streamlit as st
 from core.rag_orchestrator import ask_question
 
 
-def render_chat_panel():
-    """Renders the central chat interface and handles user interactions."""
+def render_chat_interface():
     st.header("Research Guide Q&A")
 
-    # Initialize chat history
+    # Initialize session state if it doesn't exist
     if "messages" not in st.session_state:
         st.session_state.messages = [
             {"role": "assistant",
                 "content": "Upload your reports on the right, then ask me anything!"}
         ]
 
-    # Display chat messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    # 1. Create a dedicated container for ALL messages
+    chat_container = st.container()
 
-    # Handle new input
+    # 2. Draw historical messages INSIDE the container
+    with chat_container:
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+    # 3. The input box sits independently BELOW the container
     if prompt := st.chat_input("Ask a question about your reports..."):
-        _handle_user_input(prompt)
 
+        # 4. Force new messages to render INSIDE the container (above the input box)
+        with chat_container:
 
-def _handle_user_input(prompt: str):
-    """Internal helper to process a submitted chat message."""
-    # 1. Render and save user message
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    # 2. Guard clause: Ensure vectorstore exists
-    if "vectorstore" not in st.session_state:
-        _render_assistant_message("Please upload and process a report first.")
-        st.warning(
-            "Please upload and process a report on the right before asking questions.")
-        return
-
-    # 3. Generate response via Core layer
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            answer = ask_question(st.session_state.vectorstore, prompt)
-            st.markdown(answer)
+            # Add and show user message
             st.session_state.messages.append(
-                {"role": "assistant", "content": answer})
+                {"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
 
+            # Add and show AI response
+            with st.chat_message("assistant"):
 
-def _render_assistant_message(content: str):
-    """Internal helper to render and save an assistant message directly."""
-    st.session_state.messages.append({"role": "assistant", "content": content})
-    with st.chat_message("assistant"):
-        st.markdown(content)
+                # GUARD CLAUSE: Ensure vectorstore exists before calling the AI
+                if "vectorstore" not in st.session_state:
+                    error_msg = "Please upload and process a report on the right before asking questions."
+                    st.warning(error_msg)
+                    st.markdown(error_msg)
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": error_msg})
+
+                # REAL AI LOGIC
+                else:
+                    with st.spinner("Analyzing documents..."):
+                        # Call your actual backend function
+                        answer = ask_question(
+                            st.session_state.vectorstore, prompt)
+
+                        # Display and save the real answer
+                        st.markdown(answer)
+                        st.session_state.messages.append(
+                            {"role": "assistant", "content": answer})
